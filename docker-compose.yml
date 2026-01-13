@@ -1,0 +1,34 @@
+services: # all containers we want to run
+
+  backend: # our backend container
+    build: ./backend # where to find the Dockerfile
+    ports: # which ports we use
+      - "8080:8080" # "our-own-port:container-port"
+    depends_on:
+      - db # wait until db is live
+    environment: # set connection string
+      - DB_CONN_STR=postgres://postgres:salasana@db:5432/feature_flags?sslmode=disable # =>"protocol"://"user":"password"@"container/service-name":"port"/"database-name"?"no-ssl-encryption"
+  
+  client-app: # our client-app (frontend) container
+    build: ./client-app # where to find the Dockerfile
+    ports: # which ports we use
+      - "3000:80" # "our-own-port:container-port", Nginx server listens on port 80 inside container
+
+  flag-management: # our flag-management (frontend) container
+    build: ./flag-management # where to find the Dockerfile
+    ports: # which ports we use
+      - "3001:80" # "our-own-port:container-port", Nginx server listens on port 80 inside container
+
+  db: # our database container
+    image: postgres:15-alpine # load lightweight Postgres image
+    environment: # set environment variables for Postgres
+      - POSTGRES_USER=postgres # create user
+      - POSTGRES_PASSWORD=salasana # set user password
+      - POSTGRES_DB=feature_flags # create database
+    volumes: # adress for the data storage
+      - postgres_data:/var/lib/postgresql/data # "our-volume-name:container-path"
+    ports: # which ports we use, in this case for inspecting the DB locally (optional!!)
+      - "5432:5432" # "our-own-port:container-port"
+
+volumes: # define which volumes we want to use
+  postgres_data: # the volume we want to use for Postgres data storage

@@ -1,0 +1,8 @@
+# wholeproject
+.DS_Store
+Thumbs.db
+.vscode/
+
+# backend
+backend/main
+backend/main.exe
